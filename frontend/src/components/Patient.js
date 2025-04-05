@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { Calendar, Clock, FileText, User, Users, ChevronDown, Home, UserCircle, Calendar as CalendarIcon, Hospital } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -86,6 +86,35 @@ export default function PatientDashboard() {
   const navigate = useNavigate();
 
 
+useEffect(() => {
+  const fetchPatientInfo = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+
+    try {
+      const response = await fetch('https://hospital-management-system-de1m.onrender.com/api/patient/profile', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setPatientInfo(data); // Assuming you have state like const [patientInfo, setPatientInfo] = useState(null)
+      } else {
+        console.error('Failed to fetch patient info');
+      }
+    } catch (err) {
+      console.error('Error fetching profile:', err);
+    }
+  };
+
+  fetchPatientInfo();
+}, []);
+
+
+
+
   const fetchAvailableSlots = async (doctorId, date) => {
     if (!doctorId || !date) return;
     try {
@@ -109,145 +138,159 @@ export default function PatientDashboard() {
 
   const renderDashboard = () => (
     <>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader icon={Calendar}>
-            <CardTitle className="text-sm font-medium">Today's Appointments</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {appointments.length}
-            </div>
-            {appointments.length > 0 ? (
-              <p className="text-xs text-gray-500">
-                Next: Dr. {appointments[0].doctorId.firstName} {appointments[0].doctorId.lastName} at {appointments[0].time}
-              </p>
-            ) : (
-              <p className="text-xs text-gray-500">
-                No appointments today
-              </p>
-            )}
-          </CardContent>
-          <CardFooter className="p-2">
-            <Button 
-              variant="ghost" 
-              className="w-full text-sm text-gray-500 hover:text-gray-900 transition-colors"
-              onClick={() => setShowAppointments(!showAppointments)}
-            >
-              {showAppointments ? "Hide" : "View"} Today's Appointments
-              <ChevronDown className={`h-4 w-4 ml-2 transition-transform ${showAppointments ? "rotate-180" : ""}`} />
-            </Button>
-          </CardFooter>
-          {showAppointments && (
-            <div className="px-4 pb-4">
-              {appointments.length > 0 ? (
-                appointments.map((appointment, index) => (
-                  <div key={index} className="flex justify-between items-center py-2 border-t">
-                    <div>
-                      <p className="text-sm font-medium">
-                        Dr. {appointment.doctorId.firstName} {appointment.doctorId.lastName}
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        {appointment.reason}
-                      </p>
-                    </div>
-                    <p className="text-sm">{appointment.time}</p>
-                  </div>
-                ))
-              ) : (
-                <p className="text-sm text-gray-500 text-center py-4">
-                  No appointments scheduled for today
-                </p>
-              )}
-            </div>
-          )}
-        </Card>
-        <Card>
-          <CardHeader icon={FileText}>
-            <CardTitle className="text-sm font-medium">Prescriptions</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{prescriptions.length}</div>
-            <p className="text-xs text-gray-500">Active prescriptions</p>
-          </CardContent>
-          <CardFooter className="p-2">
-            <Button 
-              variant="ghost" 
-              className="w-full text-sm text-gray-500 hover:text-gray-900 transition-colors"
-              onClick={() => setShowPrescriptions(!showPrescriptions)}
-            >
-              {showPrescriptions ? "Hide" : "View All"} Prescriptions
-              <ChevronDown className={`h-4 w-4 ml-2 transition-transform ${showPrescriptions ? "rotate-180" : ""}`} />
-            </Button>
-          </CardFooter>
-          {showPrescriptions && (
-            <div className="px-4 pb-4">
-              {prescriptions.map((prescription, index) => (
-                <div key={index} className="py-2 border-t">
-                  <p className="text-sm font-medium">{prescription.medication}</p>
-                  <p className="text-xs text-gray-500">
-                    {prescription.dosage} - {prescription.frequency}
+     <div className="min-h-screen bg-gradient-to-br from-slate-100 via-white to-blue-50 p-6">
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+    {/* Appointments Card */}
+    <Card className="backdrop-blur-md bg-blue-100/60 border border-blue-200/30 shadow-2xl rounded-2xl transition-all duration-300 hover:shadow-blue-200/50">
+    <CardHeader icon={Calendar}>
+        <CardTitle className="text-sm font-semibold text-blue-700">Today's Appointments</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="text-3xl font-bold text-blue-800">{appointments.length}</div>
+        {appointments.length > 0 ? (
+          <p className="text-xs text-blue-600">
+            Next: Dr. {appointments[0].doctorId.firstName} {appointments[0].doctorId.lastName} at {appointments[0].time}
+          </p>
+        ) : (
+          <p className="text-xs text-blue-600">No appointments today</p>
+        )}
+      </CardContent>
+      <CardFooter className="p-2">
+        <Button 
+          variant="ghost"
+          className="w-full text-sm text-blue-600 hover:text-blue-800 transition-colors"
+          onClick={() => setShowAppointments(!showAppointments)}
+        >
+          {showAppointments ? "Hide" : "View"} Today's Appointments
+          <ChevronDown className={`h-4 w-4 ml-2 transition-transform ${showAppointments ? "rotate-180" : ""}`} />
+        </Button>
+      </CardFooter>
+      {showAppointments && (
+        <div className="px-4 pb-4">
+          {appointments.length > 0 ? (
+            appointments.map((appointment, index) => (
+              <div key={index} className="flex justify-between items-center py-2 border-t">
+                <div>
+                  <p className="text-sm font-medium text-gray-800">
+                    Dr. {appointment.doctorId.firstName} {appointment.doctorId.lastName}
                   </p>
-                  <p className="text-xs text-gray-500">
-                    Prescribed by: Dr. {prescription.doctorId.firstName} {prescription.doctorId.lastName}
-                  </p>
+                  <p className="text-xs text-gray-500">{appointment.reason}</p>
                 </div>
-              ))}
-            </div>
+                <p className="text-sm font-semibold text-gray-700">{appointment.time}</p>
+              </div>
+            ))
+          ) : (
+            <p className="text-sm text-gray-500 text-center py-4">No appointments scheduled for today</p>
           )}
-        </Card>
-      </div>
-      <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Recent Activity</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ul className="space-y-2">
-              <li className="flex items-center space-x-2">
-                <Clock className="h-4 w-4 text-blue-600" />
-                <span>Blood test results collected</span>
-              </li>
-              <li className="flex items-center space-x-2">
-                <User className="h-4 w-4 text-blue-600" />
-                <span>Appointment with Dr. Johnson completed</span>
-              </li>
-              <li className="flex items-center space-x-2">
-                <FileText className="h-4 w-4 text-blue-600" />
-                <span>New prescription added</span>
-              </li>
-            </ul>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Your Care Team</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ul className="space-y-2">
-              {careTeam.map((member, index) => (
-                <li key={index} className="flex items-center space-x-2">
-                  <Users className="h-4 w-4 text-blue-600" />
-                  <span>Dr. {member.firstName} {member.lastName} - {member.specialty}</span>
-                </li>
-              ))}
-            </ul>
-          </CardContent>
-        </Card>
-      </div>
+        </div>
+      )}
+    </Card>
+
+    {/* Prescriptions Card */}
+    <Card className="backdrop-blur-md bg-blue-100/60 border border-blue-200/30 shadow-2xl rounded-2xl transition-all duration-300 hover:shadow-blue-200/50">
+    <CardHeader icon={FileText}>
+        <CardTitle className="text-sm font-semibold text-blue-700">Prescriptions</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="text-3xl font-bold text-blue-800">{prescriptions.length}</div>
+        <p className="text-xs text-blue-600">Active prescriptions</p>
+      </CardContent>
+      <CardFooter className="p-2">
+        <Button 
+          variant="ghost"
+          className="w-full text-sm text-blue-600 hover:text-blue-800 transition-colors"
+          onClick={() => setShowPrescriptions(!showPrescriptions)}
+        >
+          {showPrescriptions ? "Hide" : "View All"} Prescriptions
+          <ChevronDown className={`h-4 w-4 ml-2 transition-transform ${showPrescriptions ? "rotate-180" : ""}`} />
+        </Button>
+      </CardFooter>
+      {showPrescriptions && (
+        <div className="px-4 pb-4">
+          {prescriptions.map((prescription, index) => (
+            <div key={index} className="py-2 border-t">
+              <p className="text-sm font-medium text-gray-800">{prescription.medication}</p>
+              <p className="text-xs text-gray-500">{prescription.dosage} - {prescription.frequency}</p>
+              <p className="text-xs text-gray-500">
+                Prescribed by: Dr. {prescription.doctorId.firstName} {prescription.doctorId.lastName}
+              </p>
+            </div>
+          ))}
+        </div>
+      )}
+    </Card>
+
+  </div>
+
+  {/* Bottom Row */}
+  <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+    
+    {/* Recent Activity Card */}
+    <Card className="backdrop-blur-md bg-blue-100/60 border border-blue-200/30 shadow-2xl rounded-2xl transition-all duration-300 hover:shadow-blue-200/50">
+    <CardHeader>
+        <CardTitle className="text-sm font-semibold text-blue-700">Recent Activity</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <ul className="space-y-2 text-gray-700">
+          <li className="flex items-center gap-2">
+            <Clock className="h-4 w-4 text-blue-500" />
+            <span>Blood test results collected</span>
+          </li>
+          <li className="flex items-center gap-2">
+            <User className="h-4 w-4 text-blue-500" />
+            <span>Appointment with Dr. Johnson completed</span>
+          </li>
+          <li className="flex items-center gap-2">
+            <FileText className="h-4 w-4 text-blue-500" />
+            <span>New prescription added</span>
+          </li>
+        </ul>
+      </CardContent>
+    </Card>
+
+    {/* Care Team Card */}
+    <Card className="backdrop-blur-md bg-blue-100/60 border border-blue-200/30 shadow-2xl rounded-2xl transition-all duration-300 hover:shadow-blue-200/50">
+    <CardHeader>
+        <CardTitle className="text-sm font-semibold text-blue-700">Your Care Team</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <ul className="space-y-2 text-gray-700">
+          {careTeam.map((member, index) => (
+            <li key={index} className="flex items-center gap-2">
+              <Users className="h-4 w-4 text-blue-500" />
+              <span>Dr. {member.firstName} {member.lastName} - {member.specialty}</span>
+            </li>
+          ))}
+        </ul>
+      </CardContent>
+    </Card>
+
+  </div>
+</div>
+
+
     </>
   );
 
   const renderProfile = () => {
+    if (!patientInfo) {
+      return (
+        <div className="text-center py-10 text-gray-500">
+          Loading profile...
+        </div>
+      );
+    }
+  
     const handleInputChange = (e) => {
       const { name, value } = e.target;
       setEditedInfo(prev => ({ ...prev, [name]: value }));
     };
-
+  
     const handleSave = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await fetch('http://localhost:5000/api/patient/profile', {
+        const response = await fetch('https://hospital-management-system-de1m.onrender.com/api/patient/profile', {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -267,7 +310,7 @@ export default function PatientDashboard() {
         alert('Error updating patient profile. Please try again.');
       }
     };
-
+  
     return (
       <Card className="w-full max-w-2xl mx-auto">
         <CardHeader>
@@ -281,7 +324,7 @@ export default function PatientDashboard() {
                 <Input
                   id="firstName"
                   name="firstName"
-                  value={isEditing ? editedInfo.firstName : patientInfo?.firstName}
+                  value={isEditing ? editedInfo.firstName : patientInfo.firstName}
                   onChange={handleInputChange}
                   readOnly={!isEditing}
                 />
@@ -291,7 +334,7 @@ export default function PatientDashboard() {
                 <Input
                   id="lastName"
                   name="lastName"
-                  value={isEditing ? editedInfo.lastName : patientInfo?.lastName}
+                  value={isEditing ? editedInfo.lastName : patientInfo.lastName}
                   onChange={handleInputChange}
                   readOnly={!isEditing}
                 />
@@ -303,7 +346,7 @@ export default function PatientDashboard() {
                 id="email"
                 name="email"
                 type="email"
-                value={isEditing ? editedInfo.email : patientInfo?.email}
+                value={isEditing ? editedInfo.email : patientInfo.email}
                 onChange={handleInputChange}
                 readOnly={!isEditing}
               />
@@ -317,12 +360,21 @@ export default function PatientDashboard() {
               <Button onClick={() => setIsEditing(false)} variant="outline">Cancel</Button>
             </>
           ) : (
-            <Button onClick={() => setIsEditing(true)} className="ml-auto">Edit Profile</Button>
+            <Button
+              onClick={() => {
+                setEditedInfo(patientInfo); // Pre-fill edit form
+                setIsEditing(true);
+              }}
+              className="ml-auto"
+            >
+              Edit Profile
+            </Button>
           )}
         </CardFooter>
       </Card>
     );
   };
+  
 
   const renderAppointmentBooking = () => {
     const handleInputChange = (e) => {
