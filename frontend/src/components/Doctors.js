@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, Clock, FileText, User, Users, ChevronDown, Home, UserCircle, Calendar as CalendarIcon, Eye, EyeOff, Hospital, Stethoscope } from 'lucide-react';
+import { Calendar, Clock, FileText, User, Users, ChevronDown, Home, UserCircle, Hospital, Stethoscope } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const Button = ({ children, variant = 'primary', className = '', ...props }) => (
@@ -71,7 +71,7 @@ export default function DoctorDashboard() {
   const [isEditing, setIsEditing] = useState(false);
   const [doctorInfo, setDoctorInfo] = useState(null);
   const [editedInfo, setEditedInfo] = useState(null);
-  const [patients, setPatients] = useState([]);
+  const [patients] = useState([]);
   const [appointmentData, setAppointmentData] = useState({
     patientId: '',
     date: '',
@@ -85,14 +85,9 @@ export default function DoctorDashboard() {
   const [availableSlots, setAvailableSlots] = useState([]);
   const [selectedAction, setSelectedAction] = useState('');
   const [existingPrescriptions, setExistingPrescriptions] = useState([]);
-  const [appointments, setAppointments] = useState([]);
+  const [appointments] = useState([]);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    fetchDoctorProfile();
-    fetchPatientsWithAppointments();
-    fetchAppointments();
-  }, []);
 
   useEffect(() => {
     if (appointmentData.patientId) {
@@ -122,82 +117,7 @@ export default function DoctorDashboard() {
     }
   };
 
-  const fetchDoctorProfile = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        navigate('/login');
-        return;
-      }
-      const response = await fetch('http://localhost:5000/api/doctor/profile', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setDoctorInfo(data);
-        setEditedInfo(data);
-      } else {
-        console.error('Failed to fetch doctor profile');
-      }
-    } catch (error) {
-      console.error('Error fetching doctor profile:', error);
-    }
-  };
-
-  const fetchPatientsWithAppointments = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        navigate('/login');
-        return;
-      }
-      const response = await fetch('http://localhost:5000/api/doctor/patients-with-appointments', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      if (response.ok) {
-        const data = await response.json();
-        console.log('Patients with appointments:', data); // Add this line for debugging
-        setPatients(data);
-      } else {
-        console.error('Failed to fetch patients with appointments');
-      }
-    } catch (error) {
-      console.error('Error fetching patients with appointments:', error);
-    }
-  };
-
-  const fetchAppointments = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        navigate('/login');
-        return;
-      }
-      const response = await fetch('http://localhost:5000/api/doctor/appointments', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      if (response.ok) {
-        const data = await response.json();
-        const now = new Date();
-        // Filter and sort appointments by date and time in ascending order
-        const sortedAppointments = data
-          .filter(appointment => new Date(appointment.date) > now || (new Date(appointment.date).toLocaleDateString() === now.toLocaleDateString() && appointment.time > now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })))
-          .sort((a, b) => new Date(a.date + ' ' + a.time) - new Date(b.date + ' ' + b.time));
-        setAppointments(sortedAppointments);
-      } else {
-        console.error('Failed to fetch appointments');
-      }
-    } catch (error) {
-      console.error('Error fetching appointments:', error);
-    }
-  };
-
+ 
   const renderDashboard = () => (
     <>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -549,7 +469,6 @@ export default function DoctorDashboard() {
             })
           });
           if (response.ok) {
-            const result = await response.json();
             alert(appointmentData.prescriptionId ? 'Medication updated successfully' : 'Medication prescribed successfully');
             setAppointmentData({
               ...appointmentData,

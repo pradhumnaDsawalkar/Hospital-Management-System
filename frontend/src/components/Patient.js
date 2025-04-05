@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Calendar, Clock, FileText, User, Users, ChevronDown, Home, UserCircle, Calendar as CalendarIcon, Eye, EyeOff, Hospital } from 'lucide-react';
+import React, { useState } from 'react';
+import { Calendar, Clock, FileText, User, Users, ChevronDown, Home, UserCircle, Calendar as CalendarIcon, Hospital } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const Button = ({ children, variant = 'primary', className = '', ...props }) => (
@@ -72,7 +72,7 @@ export default function PatientDashboard() {
   const [isEditing, setIsEditing] = useState(false);
   const [patientInfo, setPatientInfo] = useState(null);
   const [editedInfo, setEditedInfo] = useState(null);
-  const [doctors, setDoctors] = useState([]);
+  const [doctors] = useState([]);
   const [appointmentData, setAppointmentData] = useState({
     doctorId: '',
     date: '',
@@ -80,65 +80,11 @@ export default function PatientDashboard() {
     reason: ''
   });
   const [availableSlots, setAvailableSlots] = useState([]);
-  const [appointments, setAppointments] = useState([]);
-  const [careTeam, setCareTeam] = useState([]);
-  const [prescriptions, setPrescriptions] = useState([]);
+  const [appointments] = useState([]);
+  const [careTeam] = useState([]);
+  const [prescriptions] = useState([]);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    fetchPatientProfile();
-    fetchDoctors();
-    fetchAppointments();
-    fetchCareTeam();
-    fetchPrescriptions();
-  }, []);
-
-  const fetchPatientProfile = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        navigate('/login');
-        return;
-      }
-      const response = await fetch('http://localhost:5000/api/patient/profile', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setPatientInfo(data);
-        setEditedInfo(data);
-      } else {
-        console.error('Failed to fetch patient profile');
-      }
-    } catch (error) {
-      console.error('Error fetching patient profile:', error);
-    }
-  };
-
-  const fetchDoctors = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        navigate('/login');
-        return;
-      }
-      const response = await fetch('http://localhost:5000/api/doctor/all', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setDoctors(data);
-      } else {
-        console.error('Failed to fetch doctors');
-      }
-    } catch (error) {
-      console.error('Error fetching doctors:', error);
-    }
-  };
 
   const fetchAvailableSlots = async (doctorId, date) => {
     if (!doctorId || !date) return;
@@ -160,75 +106,6 @@ export default function PatientDashboard() {
     }
   };
 
-  const fetchAppointments = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        navigate('/login');
-        return;
-      }
-      const response = await fetch('http://localhost:5000/api/patient/appointments', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      if (response.ok) {
-        const data = await response.json();
-        console.log('Fetched appointments:', data); // Add this line for debugging
-        setAppointments(data);
-      } else {
-        console.error('Failed to fetch appointments');
-      }
-    } catch (error) {
-      console.error('Error fetching appointments:', error);
-    }
-  };
-
-  const fetchCareTeam = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        navigate('/login');
-        return;
-      }
-      const response = await fetch('http://localhost:5000/api/patient/care-team', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setCareTeam(data);
-      } else {
-        console.error('Failed to fetch care team');
-      }
-    } catch (error) {
-      console.error('Error fetching care team:', error);
-    }
-  };
-
-  const fetchPrescriptions = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        navigate('/login');
-        return;
-      }
-      const response = await fetch('http://localhost:5000/api/patient/prescriptions', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setPrescriptions(data);
-      } else {
-        console.error('Failed to fetch prescriptions');
-      }
-    } catch (error) {
-      console.error('Error fetching prescriptions:', error);
-    }
-  };
 
   const renderDashboard = () => (
     <>
@@ -470,7 +347,6 @@ export default function PatientDashboard() {
           body: JSON.stringify(appointmentData)
         });
         if (response.ok) {
-          const result = await response.json();
           alert('Appointment booked successfully');
           setAppointmentData({
             doctorId: '',
