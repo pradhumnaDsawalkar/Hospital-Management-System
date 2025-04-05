@@ -38,7 +38,7 @@ const SignUp = () => {
     e.preventDefault();
     if (validateForm()) {
       try {
-        const response = await fetch('http://localhost:5000/api/signup', {
+        const response = await fetch(' http://localhost:5000/api/signup', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -48,13 +48,14 @@ const SignUp = () => {
             lastName: formData.lastName,
             email: formData.email,
             password: formData.password,
-            role: 'patient',
+            role: 'patient', // Default role for signup
           }),
         });
         if (response.ok) {
-          navigate('/patient'); // 👈 Go straight to patient dashboard
+          navigate('/login');
         } else {
           const errorData = await response.json();
+          console.log('Error data:', errorData); // Add this line to log the error data
           setErrors({ ...errors, submit: errorData.error });
         }
       } catch (error) {
@@ -64,105 +65,113 @@ const SignUp = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100 p-6">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl p-8">
-        <div className="mb-6 text-center">
-          <h2 className="text-3xl font-bold text-blue-600">Create Patient Account</h2>
-          <p className="text-blue-400 text-sm">Sign up to manage your appointments & records</p>
+    <div className="container mx-auto bg-blue-50 min-h-screen flex items-center justify-center max-w-full">
+      <div className="w-full max-w-md bg-white rounded-lg shadow-lg">
+        <div className="bg-blue-600 text-white rounded-t-lg p-6">
+          <h2 className="text-2xl font-bold text-center">Sign Up as a Patient</h2>
+          <p className="text-center text-blue-100">Create your account to access health services</p>
         </div>
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="text-sm font-medium text-blue-800">First Name</label>
-              <input
-                name="firstName"
-                value={formData.firstName}
-                onChange={handleChange}
-                className="w-full px-4 py-2 mt-1 border border-blue-200 rounded-xl focus:ring-2 focus:ring-blue-400 outline-none"
-              />
-              {errors.firstName && <p className="text-xs text-red-500 mt-1">{errors.firstName}</p>}
+        <div className="p-6">
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="firstName" className="block text-sm font-medium text-blue-800 text-left">First Name</label>
+                <input 
+                  id="firstName" 
+                  name="firstName" 
+                  value={formData.firstName} 
+                  onChange={handleChange} 
+                  className="mt-1 block w-full rounded-md border-blue-200 shadow-sm focus:border-blue-400 focus:ring focus:ring-blue-400 focus:ring-opacity-50 pl-1" 
+                  required
+                />
+                {errors.firstName && <p className="text-red-500 text-xs mt-1">{errors.firstName}</p>}
+              </div>
+              <div>
+                <label htmlFor="lastName" className="block text-sm font-medium text-blue-800 text-left">Last Name</label>
+                <input 
+                  id="lastName" 
+                  name="lastName" 
+                  value={formData.lastName} 
+                  onChange={handleChange} 
+                  className="mt-1 block w-full rounded-md border-blue-200 shadow-sm focus:border-blue-400 focus:ring focus:ring-blue-400 focus:ring-opacity-50 pl-1" 
+                  required
+                />
+                {errors.lastName && <p className="text-red-500 text-xs mt-1">{errors.lastName}</p>}
+              </div>
             </div>
             <div>
-              <label className="text-sm font-medium text-blue-800">Last Name</label>
-              <input
-                name="lastName"
-                value={formData.lastName}
-                onChange={handleChange}
-                className="w-full px-4 py-2 mt-1 border border-blue-200 rounded-xl focus:ring-2 focus:ring-blue-400 outline-none"
+              <label htmlFor="email" className="block text-sm font-medium text-blue-800 text-left">Email</label>
+              <input 
+                id="email" 
+                name="email" 
+                type="email" 
+                value={formData.email} 
+                onChange={handleChange} 
+                className="mt-1 block w-full rounded-md border-blue-200 shadow-sm focus:border-blue-400 focus:ring focus:ring-blue-400 focus:ring-opacity-50 pl-1" 
+                required
               />
-              {errors.lastName && <p className="text-xs text-red-500 mt-1">{errors.lastName}</p>}
+              {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
             </div>
-          </div>
-
-          <div>
-            <label className="text-sm font-medium text-blue-800">Email</label>
-            <input
-              name="email"
-              type="email"
-              value={formData.email}
-              onChange={handleChange}
-              className="w-full px-4 py-2 mt-1 border border-blue-200 rounded-xl focus:ring-2 focus:ring-blue-400 outline-none"
-            />
-            {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email}</p>}
-          </div>
-
-          <div>
-            <label className="text-sm font-medium text-blue-800">Password</label>
-            <div className="flex items-center relative">
-              <input
-                name="password"
-                type={showPassword ? 'text' : 'password'}
-                value={formData.password}
-                onChange={handleChange}
-                className="w-full px-4 py-2 border border-blue-200 rounded-xl focus:ring-2 focus:ring-blue-400 outline-none"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 text-blue-600"
-              >
-                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-              </button>
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-blue-800 text-left">Password</label>
+              <div className="flex items-center">
+                <input 
+                  id="password" 
+                  name="password" 
+                  type={showPassword ? 'text' : 'password'} 
+                  value={formData.password} 
+                  onChange={handleChange} 
+                  className="mt-1 block w-full rounded-md border-blue-200 shadow-sm focus:border-blue-400 focus:ring focus:ring-blue-400 focus:ring-opacity-50 pl-1" 
+                  required
+                />
+                <button 
+                  type="button" 
+                  className="ml-2 text-blue-600 hover:text-blue-800 focus:outline-none focus:shadow-outline"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? <EyeOff /> : <Eye />}
+                </button>
+              </div>
+              {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
             </div>
-            {errors.password && <p className="text-xs text-red-500 mt-1">{errors.password}</p>}
-          </div>
-
-          <div>
-            <label className="text-sm font-medium text-blue-800">Confirm Password</label>
-            <div className="flex items-center relative">
-              <input
-                name="confirmPassword"
-                type={showConfirmPassword ? 'text' : 'password'}
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                className="w-full px-4 py-2 border border-blue-200 rounded-xl focus:ring-2 focus:ring-blue-400 outline-none"
-              />
-              <button
-                type="button"
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute right-3 text-blue-600"
-              >
-                {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-              </button>
+            <div>
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-blue-800 text-left">Confirm Password</label>
+              <div className="flex items-center">
+                <input 
+                  id="confirmPassword" 
+                  name="confirmPassword" 
+                  type={showConfirmPassword ? 'text' : 'password'} 
+                  value={formData.confirmPassword} 
+                  onChange={handleChange} 
+                  className="mt-1 block w-full rounded-md border-blue-200 shadow-sm focus:border-blue-400 focus:ring focus:ring-blue-400 focus:ring-opacity-50 pl-1" 
+                  required
+                />
+                <button 
+                  type="button" 
+                  className="ml-2 text-blue-600 hover:text-blue-800 focus:outline-none focus:shadow-outline"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                >
+                  {showConfirmPassword ? <EyeOff /> : <Eye />}
+                </button>
+              </div>
+              {errors.confirmPassword && <p className="text-red-500 text-xs mt-1">{errors.confirmPassword}</p>}
             </div>
-            {errors.confirmPassword && <p className="text-xs text-red-500 mt-1">{errors.confirmPassword}</p>}
-          </div>
-
-          <button
-            type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-xl shadow-lg transition duration-200"
-          >
-            Create Account
-          </button>
-
-          {errors.submit && <p className="text-center text-red-500 text-xs mt-2">{errors.submit}</p>}
-        </form>
-
-        <div className="mt-6 text-sm text-center text-blue-500">
-          Already have an account?{' '}
-          <button onClick={() => navigate('/login')} className="text-blue-700 font-medium hover:underline">
-            Log in
-          </button>
+            <button 
+              type="submit" 
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            >
+              Create Account
+            </button>
+          </form>
+        </div>
+        <div className="bg-blue-50 px-6 py-4 rounded-b-lg">
+          <p className="text-sm text-blue-600 text-center">
+            Already have an account?{" "}
+            <button onClick={() => navigate('/login')} className="text-blue-600 font-semibold hover:underline">
+              Log in
+            </button>
+          </p>
+          {errors.submit && <p className="text-red-500 text-xs mt-1">{errors.submit}</p>}
         </div>
       </div>
     </div>

@@ -10,14 +10,9 @@ const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors({
-  origin: 'http://localhost:3000/', // replace with your frontend URL
-  credentials: true, // if you're using cookies/sessions
+  origin: '*',
 }));
-
 app.use(express.json());
-
-// pradhumnasedunet
-// 91UdZCGVXDcM87SY
 
 // MongoDB connection
 mongoose.connect(process.env.MONGO_URI, {
